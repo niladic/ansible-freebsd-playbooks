@@ -1,0 +1,6 @@
+ - name: ntpd config
+   template: src=ntp.conf.j2 dest=/etc/ntp.conf owner=root group=wheel mode=0444
+   notify: restart ntp
+
+ - name: ntpd is running
+   service: name=ntpd state=started

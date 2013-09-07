@@ -1,0 +1,34 @@
+hostname="{{ rc_hostname | default('local.host') }}"
+{% if rc_defaultrouter %}defaultrouter="{{ rc_defaultrouter}}"{% endif %}
+
+{% for iface in rc_ifaces %}
+ifconfig_{{ iface.name }}="{{ iface.ifconfig4 }}"
+ifconfig_{{ iface.name }}_ipv6="{{ iface.ifconfig6 }}"
+{% for alias in iface.aliases %}
+ifconfig_{{ iface.name }}_alias{{ loop.index - 1 }}="inet {{ alias.ipv4 }} netmask 255.255.255.255"
+{% endfor %}
+{% endfor %}
+
+
+{% for rc in rc_enables %}
+{{ rc.name }}_enable="{{ rc.value | default('YES') }}"
+{% endfor %}
+
+{% for line in rc_additional_lines %}
+{{ line }}
+{% endfor %}
+
+
+{% if jails %}
+jail_enable="{% if jails_rc_enable %}YES{% else %}NO{% endif %}"
+jail_list="{% for jail in jails %}{{ jail.name + ' ' }}{% endfor %}"
+
+{% for jail in jails %}
+jail_{{ jail.name }}_rootdir="{{ jail.rootdir }}"
+jail_{{ jail.name }}_hostname="{{ jail.hostname }}"
+jail_{{ jail.name }}_ip="{{ jail.ipv4 }}"
+jail_{{ jail.name }}_exec="/bin/sh /etc/rc"
+jail_{{ jail.name }}_devfs_enable="YES"
+jail_{{ jail.name }}_devfs_ruleset="devfsrules_jail"
+{% endfor %}
+{% endif %}

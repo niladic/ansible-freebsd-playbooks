@@ -1,0 +1,7 @@
+---
+ - name: rc.conf
+   template: src={{ config_options.rc.template_name }}.j2 dest=/etc/rc.conf owner=root group=wheel mode=0444
+
+ - name: Be sure /etc/rc.conf.d exist
+   file: path=/etc/rc.conf.d/ state=directory owner=root group=wheel mode=0655
+   when: config_options.rc.split_conf

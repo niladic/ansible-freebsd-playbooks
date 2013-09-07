@@ -7,3 +7,6 @@
 
  - name: reload pf
    service: name=pf state=reloaded
+
+ - name: restart ntpd
+   service:  name=ntpd state=restarted

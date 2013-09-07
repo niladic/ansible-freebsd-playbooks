@@ -13,3 +13,61 @@ ipv4_whitelist:
   - ansiblehost.domain
 default_tcp_ports_authorized:
   - ssh
+
+# sysctl
+sysctl_flags:
+  - name: 'security.bsd.unprivileged_proc_debug'
+    value: 0
+  - name: 'security.bsd.see_other_uids'
+    value: 0
+  - name: 'net.inet.tcp.drop_synfin'
+    value: 1
+  - name: 'net.inet.tcp.blackhole'
+    value: 2
+  - name: 'net.inet.udp.blackhole'
+    value: 1
+
+# Options to enable certain configuration parts
+config_options:
+  sshd:
+    is_enabled: True
+  ntpd:
+    is_enabled: True
+  rc:
+    is_enabled: True
+    template_name: rc.conf.single
+    # to enable split conf files in rc.conf.d
+    split_conf: False
+  pkgng:
+    is_enabled: False
+    packages:
+      - vim-lite
+      - screen
+      - nmap
+      - zsh
+      - git
+      - mercurial
+      - curl
+  sudo:
+    is_enabled: False
+
+# rc configuration
+rc_hostname: 'vm.fbsd'
+rc_ifaces:
+  - name: em0
+    ifconfig4: 'DHCP'
+    ifconfig6: 'inet6 accept_rtadv'
+#    aliases: $jails
+rc_enables:
+  - name: sshd
+  - name: ntpdate
+  - name: ntpd
+  - name: zfs
+  - name: pf
+  - name: fsck_y
+rc_additional_lines:
+  - 'keymap="fr.macbook.acc.kbd"'
+  - 'ntpdate_flags="-b"'
+  - 'dumpdev="NO"'
+loader_conf_lines:
+  - 'vfs.zfs.arc_max="4096M"'
