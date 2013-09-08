@@ -1,20 +1,42 @@
 ---
-# SSH
+#### SSH
 ansible_ssh_user: root
 ansible_ssh_private_key_file: ~/.ssh/id_dsa
 ssh_public_key_file:  ~/.ssh/id_dsa.pub
 
-# FreeBSD
+#### FreeBSD
 ansible_python_interpreter: /usr/local/bin/python
 zfs_checksum: fletcher4
 
-# PF
+#### PF
 ipv4_whitelist:
   - ansiblehost.domain
 default_tcp_ports_authorized:
   - ssh
 
-# sysctl
+#### sshd configuration sshd_config.j2
+sshd_version_addendum: 'FreeBSD-20110503'
+sshd_listen_address4: '0.0.0.0'
+# Use ansible discovered ipv4 address
+# sshd_listen_address4: ansible_default_ipv4.address
+sshd_listen_address6: '::'
+sshd_permit_root_login: no
+sshd_password_auth: no
+sshd_challenge_response_auth: yes
+sshd_use_pam: yes
+sshd_allow_agent_forwarding: no
+sshd_allow_tcp_forwarding: no
+sshd_x11_forwarding: no
+sshd_use_dns: no
+
+#### NTP config ntp.conf.j2
+ntp_logfile: /var/log/ntpd.log
+ntp_additional_servers:
+  - server 3.freebsd.pool.ntp.org iburst
+ntp_restricts:
+  - 127.0.0.1
+
+#### sysctl
 sysctl_flags:
   - name: 'security.bsd.unprivileged_proc_debug'
     value: 0
@@ -27,7 +49,8 @@ sysctl_flags:
   - name: 'net.inet.udp.blackhole'
     value: 1
 
-# Options to enable certain configuration parts
+#### Options to enable certain configuration parts
+#### This part is mandatory until roles can be included as sub-roles
 config_options:
   sshd:
     is_enabled: True
@@ -51,7 +74,7 @@ config_options:
   sudo:
     is_enabled: False
 
-# rc configuration
+#### rc configuration
 rc_hostname: 'vm.fbsd'
 rc_ifaces:
   - name: em0
@@ -69,5 +92,7 @@ rc_additional_lines:
   - 'keymap="fr.macbook.acc.kbd"'
   - 'ntpdate_flags="-b"'
   - 'dumpdev="NO"'
+
+#### /boot/loader.conf
 loader_conf_lines:
   - 'vfs.zfs.arc_max="4096M"'

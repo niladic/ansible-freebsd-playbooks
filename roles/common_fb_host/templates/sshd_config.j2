@@ -15,13 +15,15 @@
 # Note that some of FreeBSD's defaults differ from OpenBSD's, and
 # FreeBSD has a few additional options.
 
-VersionAddendum
+#VersionAddendum FreeBSD-20110503
+VersionAddendum {{ sshd_version_addendum | default('') }}
 
 #Port 22
 #AddressFamily any
 #ListenAddress 0.0.0.0
+ListenAddress {{ sshd_listen_address4 | default('0.0.0.0') }}
 #ListenAddress ::
-ListenAddress {{ ansible_default_ipv4.address }}
+{% if sshd_listen_address6 %}ListenAddress {{ sshd_listen_address6 }}{% endif %}
 
 # The default requires explicit activation of protocol 1
 #Protocol 2
@@ -45,7 +47,8 @@ ListenAddress {{ ansible_default_ipv4.address }}
 # Authentication:
 
 #LoginGraceTime 2m
-PermitRootLogin yes
+#PermitRootLogin no
+PermitRootLogin {{ sshd_permit_root_login | default('no') }}
 #StrictModes yes
 #MaxAuthTries 6
 #MaxSessions 10
@@ -65,11 +68,13 @@ PermitRootLogin yes
 #IgnoreRhosts yes
 
 # Change to yes to enable built-in password authentication.
-PasswordAuthentication no
-PermitEmptyPasswords no
+#PasswordAuthentication no
+PasswordAuthentication {{ sshd_password_auth | default('no') }}
+#PermitEmptyPasswords no
 
 # Change to no to disable PAM authentication
 #ChallengeResponseAuthentication yes
+ChallengeResponseAuthentication {{ sshd_challenge_response_auth | default('yes') }}
 
 # Kerberos options
 #KerberosAuthentication no
@@ -91,11 +96,15 @@ PermitEmptyPasswords no
 # PAM authentication, then enable this but set PasswordAuthentication
 # and ChallengeResponseAuthentication to 'no'.
 #UsePAM yes
+UsePAM {{ sshd_use_pam | default('yes') }}
 
 #AllowAgentForwarding yes
+AllowAgentForwarding {{ sshd_allow_agent_forwarding | default('no') }}
 #AllowTcpForwarding yes
+AllowTcpForwarding {{ sshd_allow_tcp_forwarding | default('no') }}
 #GatewayPorts no
 #X11Forwarding yes
+X11Forwarding {{ sshd_x11_forwarding | default('no') }}
 #X11DisplayOffset 10
 #X11UseLocalhost yes
 #PrintMotd yes
@@ -108,6 +117,7 @@ PermitEmptyPasswords no
 #ClientAliveInterval 0
 #ClientAliveCountMax 3
 #UseDNS yes
+UseDNS {{ sshd_use_dns | default('yes') }}
 #PidFile /var/run/sshd.pid
 #MaxStartups 10
 #PermitTunnel no
